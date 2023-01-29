@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'versions.apps.VersionsConfig',
+    'school.apps.SchoolConfig',
     'rest_framework'
 ]
 
@@ -71,6 +72,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rulebookMetadataPOC.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
