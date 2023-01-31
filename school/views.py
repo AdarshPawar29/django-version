@@ -28,6 +28,7 @@ def student_list(request):
             serializer = StudentSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
+                reversion.set_comment(f"1st created version")
                 return JsonResponse(serializer.data, status=201)
             return JsonResponse(serializer.errors, status=400)
 
@@ -40,11 +41,15 @@ def student_detail(request, pk):
         # Load a queryset of versions for a specific model instance.
         # print("->>", Version.objects.get_for_object(student))
         versions = Version.objects.get_for_object(student)
-        print("versions->>", versions)
+        for version in versions:
+            print("version->>", version.field_dict)
+            print("versions comment->>", version.revision.comment)
+
+        # print("versions->>", versions)
         # print("versions->>", versions[2].field_dict)
-        print("versions comment->>", versions[0].revision.comment)
-        print("active version ->>", reversion.is_active())
-        versions[2].revision.revert()
+        # print("versions comment->>", versions[0].revision.comment)
+        # print("active version ->>", reversion.is_active())
+        # versions[2].revision.revert()
         serializer = StudentSerializer(student)
         return JsonResponse(serializer.data)
     elif request.method == 'PUT':
@@ -70,11 +75,12 @@ def teacher_list(request):
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = TeacherSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+        with reversion.create_revision():
+            serializer = TeacherSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data, status=201)
+            return JsonResponse(serializer.errors, status=400)
 
 
 @csrf_exempt
@@ -83,14 +89,19 @@ def teacher_detail(request, pk):
 
     if request.method == 'GET':
         serializer = TeacherSerializer(teacher)
+        versions = Version.objects.get_for_object(teacher)
+        for version in versions:
+            print("version->>", version.field_dict)
+            print("versions comment->>", version.revision.comment)
         return JsonResponse(serializer.data)
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = TeacherSerializer(teacher, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+        with reversion.create_revision():
+            serializer = TeacherSerializer(teacher, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors, status=400)
     elif request.method == 'DELETE':
         teacher.delete()
         return HttpResponse(status=204)
@@ -105,10 +116,11 @@ def subject_list(request):
     elif request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = SubjectSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+        with reversion.create_revision():
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data, status=201)
+            return JsonResponse(serializer.errors, status=400)
 
 
 @csrf_exempt
@@ -117,14 +129,19 @@ def subject_detail(request, pk):
 
     if request.method == 'GET':
         serializer = SubjectSerializer(subject)
+        versions = Version.objects.get_for_object(subject)
+        for version in versions:
+            print("version->>", version.field_dict)
+            print("versions comment->>", version.revision.comment)
         return JsonResponse(serializer.data)
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = SubjectSerializer(subject, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+        with reversion.create_revision():
+            serializer = SubjectSerializer(subject, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors, status=400)
     elif request.method == 'DELETE':
         subject.delete()
         return HttpResponse(status=204)
@@ -138,11 +155,12 @@ def enrollment_list(request):
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = EnrollmentSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+        with reversion.create_revision():
+            serializer = EnrollmentSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data, status=201)
+            return JsonResponse(serializer.errors, status=400)
 
 
 @csrf_exempt
@@ -151,14 +169,19 @@ def enrollment_detail(request, pk):
 
     if request.method == 'GET':
         serializer = EnrollmentSerializer(enrollment)
+        versions = Version.objects.get_for_object(enrollment)
+        for version in versions:
+            print("version->>", version.field_dict)
+            print("versions comment->>", version.revision.comment)
         return JsonResponse(serializer.data)
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = EnrollmentSerializer(enrollment, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+        with reversion.create_revision():
+            serializer = EnrollmentSerializer(enrollment, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors, status=400)
     elif request.method == 'DELETE':
         enrollment.delete()
         return HttpResponse(status=204)

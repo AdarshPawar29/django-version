@@ -26,13 +26,17 @@ class Teacher(models.Model):
     email = models.EmailField(unique=True)
 
 
+@reversion.register()
 class Subject(models.Model):
+    pass
     name = models.CharField(max_length=100)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     students = models.ManyToManyField(Student, through='Enrollment')
 
 
+@reversion.register()
 class Enrollment(models.Model):
+    pass
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    date_enrolled = models.DateField()
+    date_enrolled = models.DateField(null=True)
