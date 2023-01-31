@@ -1,15 +1,26 @@
 from django.db import models
+from auditlog.registry import auditlog
 
-# Create your models here.
+# reversion
+from django.contrib import admin
+from reversion.admin import VersionAdmin
+import reversion
 
 
+@reversion.register()
 class Student(models.Model):
+    pass
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
 
 
+auditlog.register(Student)  # to create a log of data
+
+
+@reversion.register()
 class Teacher(models.Model):
+    pass
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
