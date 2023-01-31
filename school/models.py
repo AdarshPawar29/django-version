@@ -7,7 +7,7 @@ from reversion.admin import VersionAdmin
 import reversion
 
 
-@reversion.register()
+# @reversion.register()
 class Student(models.Model):
     pass
     first_name = models.CharField(max_length=50)
@@ -18,7 +18,7 @@ class Student(models.Model):
 auditlog.register(Student)  # to create a log of data
 
 
-@reversion.register()
+# @reversion.register()
 class Teacher(models.Model):
     pass
     first_name = models.CharField(max_length=50)
@@ -26,7 +26,7 @@ class Teacher(models.Model):
     email = models.EmailField(unique=True)
 
 
-@reversion.register()
+# @reversion.register(follow=["teacher", "students"])
 class Subject(models.Model):
     pass
     name = models.CharField(max_length=100)
@@ -34,9 +34,15 @@ class Subject(models.Model):
     students = models.ManyToManyField(Student, through='Enrollment')
 
 
-@reversion.register()
+# @reversion.register(follow=["student", "subject"])
 class Enrollment(models.Model):
     pass
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     date_enrolled = models.DateField(null=True)
+
+
+reversion.register(Student)
+reversion.register(Teacher)
+reversion.register(Subject, follow=["teacher", "students"])
+reversion.register(Enrollment, follow=["student", "subject"])
