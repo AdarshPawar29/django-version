@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, Teacher, Subject, Enrollment
+from .models import ClassRoom, Student, Teacher, Subject, Enrollment
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -15,6 +15,11 @@ class TeacherSerializer(serializers.ModelSerializer):
         depth = 1
         fields = '__all__'
 
+    # def to_representation(self, instance):
+    #     rep = super(TeacherSerializer, self).to_representation(instance)
+    #     rep['name'] = instance.teacher.first_name
+    #     return rep
+
 
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,4 +32,11 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
         depth = 1
-        fields = ['student', 'subject']
+        fields = '__all__'
+
+
+class ClassRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassRoom
+        depth = 1
+        fields = '__all__'

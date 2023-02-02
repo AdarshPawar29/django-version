@@ -9,7 +9,6 @@ import reversion
 
 # @reversion.register()
 class Student(models.Model):
-    pass
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
@@ -18,31 +17,46 @@ class Student(models.Model):
 auditlog.register(Student)  # to create a log of data
 
 
-# @reversion.register()
 class Teacher(models.Model):
-    pass
-    first_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, )
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
 
 
-# @reversion.register(follow=["teacher", "students"])
 class Subject(models.Model):
-    pass
     name = models.CharField(max_length=100)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    students = models.ManyToManyField(Student, through='Enrollment')
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, related_name="subjectTeacher")
+    students = models.ManyToManyField(
+        Student, through='Enrollment', related_name="subjectStudent")
 
 
-# @reversion.register(follow=["student", "subject"])
+class ClassRoom(models.Model):
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+    capacity = models.PositiveIntegerField()
+    students = models.ManyToManyField(
+        Student, through='Enrollment', related_name="classStudent")
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, related_name="classTeacher")
+    subject = models.ForeignKey(
+        Subject, on_delete=models.CASCADE, related_name="classSubject")
+
+
 class Enrollment(models.Model):
-    pass
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name="enrollmentStudent")
+    subject = models.ForeignKey(
+        Subject, on_delete=models.CASCADE, related_name="enrollmentSubject")
+    classroom = models.ForeignKey(
+        ClassRoom, on_delete=models.CASCADE, related_name="enrollmentClassRoom")
     date_enrolled = models.DateField(null=True)
 
 
-reversion.register(Student)
-reversion.register(Teacher)
-reversion.register(Subject, follow=["teacher", "students"])
-reversion.register(Enrollment, follow=["student", "subject"])
+reversion.register(
+    Student, follow=["subjectStudent", "classStudent", "enrollmentStudent"])
+reversion.register(
+    Teacher, follow=["subjectTeacher", "classTeacher"])
+reversion.register(Subject, follow=["classSubject", "enrollmentSubject"])
+reversion.register(Enrollment)
+reversion.register(ClassRoom, follow=["enrollmentClassRoom"])
